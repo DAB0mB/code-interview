@@ -75,19 +75,20 @@ Use the mock info under `/providers/providers.json` as your data source, but wri
 
 - Create a REST server with the following endpoint:
    `GET /appointments?specialty=<SPECIALTY>&date=<DATE>&minScore=<SCORE>`
-   * The results should take into acount:
+   * The results should take into account:
      * **Threshold:** They should only get providers whose scores are matching that threshold <SCORE> (inclusive, if `minScore=9.0` then a provider with score 9.0 should be valid)
      * **Specialty:** They should only get providers that specialize in that specific specialty. Specialty is not case sensitive.
      * **Availability:** They should only get providers that are available in the specific time requested
      * **Ordering:** The providers should be ordered by score from highest to lowest
   * The endpoint should return an array of **provider names** according to the order defined above.
   * If there are no suitable providers the endpoint should return an **empty array**.
-  * If the user gave bad parameters, like a missing specialty or a bad date format (should be [milliseconds since epoch](https://currentmillis.com/?now#unix-timestamp)), the server should return a `400 (BAD REQUEST)` code.
+  * If the user gave bad parameters, like a missing specialty, or a bad date format (should be [milliseconds since epoch](https://currentmillis.com/?now#unix-timestamp)), the server should return a `400 (BAD REQUEST)` code.
 
 - Create an endpoint to set up an appointment:
 `POST /appointments`
 	`BODY: { “name”: string, “date”: date }`:
   * The server should validate that such an availability exists. If it doesn’t, the server should return `400 (BAD REQUEST)`.
   * If such an availability does exist, the server should return a `200 (OK)` response to the client.
+  * This endpoint does not actually change the providers data, they will be mutated in the bonus part ;).
 
 # Good luck from all of us at Vim!
