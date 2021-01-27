@@ -66,7 +66,7 @@ The dates are inclusive, meaning that if a provider has an availability of `{"fr
 - Run `npm install` inside `./test`.
 - To run the tests for this part, you will need to have the server that you will implement running in the background.
   * Your server should be running on port `3500`. You can change this in `./test/config.js`.
-  * In `./test` execute `npm run test-a`.
+  * In `./test` execute `npm run test`.
 
 ### Exercise
 The goal of this part is to create a REST endpoint to allow users to set up appointments. Users look for a provider with a specific specialty (e.g ‘Neurologist’, ‘Cardiologist’) and with availability for a certain date. They should receive a list of providers ordered by relevance, and should be able to select one and set up an appointment with them.
