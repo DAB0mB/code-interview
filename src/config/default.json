@@ -1,0 +1,5 @@
+{
+  "port": 3500,
+  "mongoUri": "",
+  "baseUrl": "http://localhost:3500"
+}
