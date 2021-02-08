@@ -6,44 +6,42 @@ import { useModels, usePubsub } from '../registry';
 const router = express.Router();
 router.use(bodyParser.json());
 
-router.get('/', async (req, res) => {
-  const models = useModels();
-
-  let providers;
-  try {
-    providers = await models.provider.findProviders({ ...req.query, name: '*' });
-  }
-  catch (e) {
-    res.statusCode = e.code || 500;
-    return res.send(e.message);
-  }
-
-  res.statusCode = 200;
-  res.send(providers.map(p => p.name));
-});
-
-router.post('/', async (req, res) => {
+router.put('/', async (req, res) => {
   const models = useModels();
   const pubsub = usePubsub();
 
-  let providers;
+  let provider;
   try {
-    providers = await models.provider.findProviders({ ...req.body, specialty: '*', minScore: 0 });
+    provider = await models.provider.updateProvider(req.body);
   }
   catch (e) {
     res.statusCode = e.code || 500;
     return res.send(e.message);
   }
 
-  if (!providers.length) {
-    res.statusCode = 400;
-    return res.send([]);
+  res.statusCode = 200;
+  res.send(provider);
+
+  pubsub.publish('updateProvider', provider);
+});
+
+router.delete('/', async (req, res) => {
+  const models = useModels();
+  const pubsub = usePubsub();
+
+  let providerName;
+  try {
+    providerName = await models.provider.deleteProvider(req.body);
+  }
+  catch (e) {
+    res.statusCode = e.code || 500;
+    return res.send(e.message);
   }
 
   res.statusCode = 200;
-  res.send(providers.map(p => p.name));
+  res.send(providerName);
 
-  pubsub.publish('newAppointments', { name: req.body.name, date: req.body.date });
+  pubsub.publish('deleteProvider', providerName);
 });
 
 export default router;

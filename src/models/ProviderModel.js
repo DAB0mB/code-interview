@@ -12,8 +12,8 @@ class ProviderModel extends Model {
     super(dataset);
   }
 
-  // Simulate async
   async findProviders({ name, specialty, date, minScore } = {}) {
+    // TODO: Add validation library
     if (name == null) {
       const err = TypeError('query.name was not provided');
       err.code = 400;
@@ -89,9 +89,98 @@ class ProviderModel extends Model {
       return true;
     });
 
-    return providers
-      .sort((a, b) => a.score > b.score ? -1 : 1)
-      .map(p => p.name);
+    return providers.sort((a, b) => a.score > b.score ? -1 : 1);
+  }
+
+  async updateProvider({ name, score, specialties } = {}) {
+    if (name == null) {
+      const err = TypeError('query.name was not provided');
+      err.code = 400;
+
+      throw err;
+    }
+
+    if (!name) {
+      const err = TypeError('query.name cannot be empty');
+      err.code = 400;
+
+      throw err;
+    }
+
+    if (score == null) {
+      const err = TypeError('query.score was not provided');
+      err.code = 400;
+
+      throw err;
+    }
+
+    if (specialties == null) {
+      const err = TypeError('query.specialties was not provided');
+      err.code = 400;
+
+      throw err;
+    }
+
+    if (!(specialties instanceof Array)) {
+      const err = TypeError('query.specialties must be an array');
+      err.code = 400;
+
+      throw err;
+    }
+
+    score = Number(score);
+
+    if (Number.isNaN(score)) {
+      const err = TypeError('query.score is not a number');
+      err.code = 400;
+
+      throw err;
+    }
+
+    const provider = {
+      name,
+      $name: name.toLowerCase(),
+      score,
+      specialties,
+      $specialties: specialties.map(s => s.toLowerCase()),
+      availableDates: [],
+    };
+
+    this.dataset.push(provider);
+
+    return provider;
+  }
+
+  async deleteProvider({ name } = {}) {
+    if (name == null) {
+      const err = TypeError('query.name was not provided');
+      err.code = 400;
+
+      throw err;
+    }
+
+    name = String(name).toLowerCase();
+
+    if (!name) {
+      const err = TypeError('query.name cannot be empty');
+      err.code = 400;
+
+      throw err;
+    }
+
+    const index = this.dataset.findIndex(p => p.$name === name);
+
+    if (!~index) {
+      const err = TypeError('provider not found');
+      err.code = 404;
+
+      throw err;
+    }
+
+    const provider = this.dataset[index];
+    delete this.dataset[index];
+
+    return provider.name;
   }
 }
 
