@@ -20,7 +20,7 @@ registerRouters(app);
 
 const server = createServer(app);
 
-bootstrap(server, io).then(() => {
+bootstrap(server).then(() => {
   server.listen({ port: config.port, host: config.host }, () => {
     console.log(`Git streamer server running on http://${config.host}:${config.port}`);
   });

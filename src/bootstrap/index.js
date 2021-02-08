@@ -1,10 +1,12 @@
 import { provideServer } from '../registry';
+import bootstrapModels from './bootstrapModels';
 
-const bootstrap = async (server, io, turn) => {
+const bootstrap = async (server) => {
   provideServer(server);
 
   return Promise.all([
-    // Add bootstrap logic
+    bootstrapModels(),
+    // bootstrapSomething(),
   ]);
 };
 
