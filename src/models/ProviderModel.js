@@ -2,8 +2,25 @@ import { zeroTimezone } from '../util';
 import Model from './Model';
 
 class ProviderModel extends Model {
+  constructor(dataset) {
+    for (let d of dataset) {
+      d.$name = d.name.toLowerCase();
+      d.$specialties = d.specialties.map(s => s.toLowerCase());
+      d.$availableDates = d.availableDates.map(d => ({ from: zeroTimezone(d.from), to: zeroTimezone(d.to) }));
+    }
+
+    super(dataset);
+  }
+
   // Simulate async
-  async findProviders({ specialty, date, minScore } = {}) {
+  async findProviders({ name, specialty, date, minScore } = {}) {
+    if (name == null) {
+      const err = TypeError('query.name was not provided');
+      err.code = 400;
+
+      throw err;
+    }
+
     if (specialty == null) {
       const err = TypeError('query.specialty was not provided');
       err.code = 400;
@@ -25,9 +42,17 @@ class ProviderModel extends Model {
       throw err;
     }
 
+    name = String(name).toLowerCase();
     specialty = String(specialty).toLowerCase();
-    date = Number(date);
+    date = zeroTimezone(Number(date));
     minScore = Number(minScore);
+
+    if (!name) {
+      const err = TypeError('query.name cannot be empty');
+      err.code = 400;
+
+      throw err;
+    }
 
     if (!specialty) {
       const err = TypeError('query.specialty cannot be empty');
@@ -50,15 +75,13 @@ class ProviderModel extends Model {
       throw err;
     }
 
-    // Zero timezone
-    date = zeroTimezone(date);
-
     const providers = this.dataset.filter((provider) => {
+      if (name != '*' && provider.$name !== name) return false;
+      if (specialty != '*' && !provider.$specialties.includes(specialty)) return false;
       if (provider.score < minScore) return false;
-      if (!provider.specialties.map(s => s.toLowerCase()).includes(specialty)) return false;
 
-      const isAvailable = provider.availableDates.some(({ from, to }) => {
-        return zeroTimezone(from) <= date && zeroTimezone(to) >= date;
+      const isAvailable = provider.$availableDates.some(({ from, to }) => {
+        return from <= date && to >= date;
       });
 
       if (!isAvailable) return false;
