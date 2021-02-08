@@ -3,7 +3,7 @@ import { noop, upperFirst } from './util';
 
 let registry = new Map();
 const stack = [];
-export const keys = Object.freeze(['server', 'models']);
+export const keys = Object.freeze(['server', 'models', 'pubsub']);
 
 for (let key of keys) {
   const Key = upperFirst(key);

@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 
-import { useModels } from '../registry';
+import { useModels, usePubsub } from '../registry';
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const models = useModels();
+  const pubsub = usePubsub();
 
   let providers;
   try {
@@ -41,6 +42,8 @@ router.post('/', async (req, res) => {
 
   res.statusCode = 200;
   res.send(providers);
+
+  pubsub.publish('newAppointments', req.body);
 });
 
 export default router;
